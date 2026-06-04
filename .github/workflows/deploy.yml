@@ -13,7 +13,11 @@ jobs:
         with:
           node-version: lts/*
           cache: pnpm
-      - run: pnpm install
-      - run: pnpm void deploy
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run db:migrate:remote
         env:
-          VOID_TOKEN: ${{ secrets.VOID_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - run: pnpm run build
+      - run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

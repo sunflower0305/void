@@ -25,7 +25,6 @@ routes/             文件路由 API
 db/schema.ts        Drizzle D1 schema
 db/migrations/      D1 迁移文件
 wrangler.jsonc      Cloudflare Workers 直部署配置
-void.json           Void 项目配置
 ```
 
 ## 本地开发
@@ -82,7 +81,7 @@ pnpm exec void db generate
 应用远端 D1 迁移：
 
 ```bash
-pnpm exec wrangler d1 migrations apply void1-db --remote
+pnpm run db:migrate:remote
 ```
 
 查看远端表：
@@ -127,18 +126,20 @@ export CLOUDFLARE_API_TOKEN="你的 token"
 部署命令：
 
 ```bash
+pnpm run deploy:dry-run
+pnpm run deploy
+```
+
+拆开执行时，对应命令是：
+
+```bash
+pnpm run db:migrate:remote
 pnpm run build
 pnpm exec wrangler deploy --dry-run
 pnpm exec wrangler deploy
 ```
 
-也可以直接用 `vp` 构建：
-
-```bash
-pnpm exec vp build
-pnpm exec wrangler deploy --dry-run
-pnpm exec wrangler deploy
-```
+GitHub Actions 会在 `main` 分支 push 后自动执行同一条链路。仓库需要配置 `CLOUDFLARE_API_TOKEN` 这个 GitHub Secret。
 
 部署后验证：
 
@@ -151,6 +152,6 @@ pnpm exec wrangler deployments list --name void1
 ## 注意事项
 
 - `.env*` 已被 `.gitignore` 忽略，只保留 `.env.example` 可以提交。
-- `dist/`、`.void/`、`.wrangler/` 都是生成产物，不提交。
+- `dist/`、`.void/`、`.wrangler/`、`.agents/` 都是生成或本机辅助目录，不提交。
 - `wrangler.jsonc` 不需要写 `main` 或 `assets`，Void/Cloudflare Vite 插件会在构建时生成。
 - 不要在 `wrangler.jsonc` 里重复写 `nodejs_als`。Void 构建会注入该兼容标记，重复会导致 Cloudflare API 拒绝部署。
