@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "void1",
+  "compatibility_date": "2026-06-04",
+  "routes": [{ "pattern": "void.zhangleyang.com", "custom_domain": true }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "void1-db",
+      "database_id": "eaba2cb8-0bee-4db3-8099-b3be2663f690",
+      "migrations_dir": "./db/migrations"
+    }
+  ]
+}
