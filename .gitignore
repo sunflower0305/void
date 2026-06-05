@@ -2,6 +2,7 @@ node_modules
 dist
 .void
 .wrangler
+.wrangler-logs
 .agents
 *.tsbuildinfo
 .DS_Store

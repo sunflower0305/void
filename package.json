@@ -20,8 +20,9 @@
     "build": "vp build",
     "preview": "vp preview",
     "db:migrate:remote": "vp exec wrangler d1 migrations apply void1-db --remote",
+    "db:seed:remote": "vp exec wrangler d1 execute void1-db --remote --file db/seed.sql",
     "deploy:dry-run": "vp build && vp exec wrangler deploy --dry-run",
-    "deploy": "vp exec wrangler d1 migrations apply void1-db --remote && vp build && vp exec wrangler deploy"
+    "deploy": "vp exec wrangler d1 migrations apply void1-db --remote && vp exec wrangler d1 execute void1-db --remote --file db/seed.sql && vp build && vp exec wrangler deploy"
   },
   "dependencies": {
     "hono": "^4.12.23",

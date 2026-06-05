@@ -1,11 +1,20 @@
-# void1
+# Cloudflare AppOps Dashboard
 
-Void + React starter，使用 Void 的 `pages/` 页面模式、`routes/` 文件路由 API 和 Cloudflare D1。当前生产环境直接部署到 Cloudflare Workers，不走 Void 平台部署。
+Void + React + D1 应用健康看板，用来监控已经发布在 Cloudflare 上的真实应用：
+
+- Blog: https://blog.zhangleyang.com
+- Job: https://job.zhangleyang.com
+- Todo: https://todo.zhangleyang.com
+- Home: https://zhangleyang.com
+- Demo: https://demo.zhangleyang.com
+- Self: https://void.zhangleyang.com
+
+这个项目使用 Void 的 `pages/` 页面模式、`routes/` 文件路由 API 和 Cloudflare D1。当前生产环境直接部署到 Cloudflare Workers，不走 Void 平台部署。
 
 线上地址：
 
 - App: https://void.zhangleyang.com
-- API: https://void.zhangleyang.com/api/hello
+- API: https://void.zhangleyang.com/api/status
 
 ## 技术栈
 
@@ -17,6 +26,14 @@ Void + React starter，使用 Void 的 `pages/` 页面模式、`routes/` 文件�
 - Cloudflare D1
 - Wrangler `4.x`
 
+## 功能
+
+- `/`：公开应用健康看板，展示当前状态、响应时间、最近检测时间、技术栈标签和最近检测记录。
+- `/admin`：轻量管理台，支持添加、编辑、启用/停用监控目标，并手动触发检测。
+- `POST /api/check`：检测所有启用的应用。
+- `POST /api/check/:slug`：检测单个应用。
+- `GET /api/status`：输出公开 JSON 状态，方便文章展示 API route。
+
 ## 目录
 
 ```text
@@ -24,6 +41,7 @@ pages/              Void 页面模式和服务端 loader
 routes/             文件路由 API
 db/schema.ts        Drizzle D1 schema
 db/migrations/      D1 迁移文件
+src/appops.ts       应用聚合和健康检测服务
 wrangler.jsonc      Cloudflare Workers 部署配置
 ```
 
@@ -63,6 +81,11 @@ vp preview
 
 项目使用 `void/db` 访问 D1，schema 定义在 `db/schema.ts`。当前生产数据库是 `void1-db`，在 `wrangler.jsonc` 中绑定为 `DB`。
 
+当前核心表：
+
+- `apps`：监控目标，包括名称、slug、URL、描述、技术栈和启用状态。
+- `check_runs`：每一次健康检测结果，包括状态、HTTP 状态码、响应时间和错误信息。
+
 本地原型阶段可以直接推 schema：
 
 ```bash
@@ -79,6 +102,12 @@ vp exec void db generate
 
 ```bash
 vp exec wrangler d1 migrations apply void1-db --remote
+```
+
+向远端 D1 写入默认监控目标：
+
+```bash
+vp run db:seed:remote
 ```
 
 查看远端表：
@@ -131,6 +160,7 @@ vp run deploy
 
 ```bash
 vp exec wrangler d1 migrations apply void1-db --remote
+vp exec wrangler d1 execute void1-db --remote --file db/seed.sql
 vp build
 vp exec wrangler deploy --dry-run
 vp exec wrangler deploy
@@ -142,8 +172,15 @@ GitHub Actions 会在 `main` 分支 push 后自动执行同一条链路。仓库
 
 ```bash
 curl -fsS https://void.zhangleyang.com/
-curl -fsS https://void.zhangleyang.com/api/hello
+curl -fsS https://void.zhangleyang.com/api/status
 vp exec wrangler deployments list --name void1
+```
+
+手动触发一次线上检测：
+
+```bash
+curl -fsS -X POST https://void.zhangleyang.com/api/check
+curl -fsS https://void.zhangleyang.com/api/status
 ```
 
 ## 注意事项
@@ -152,3 +189,5 @@ vp exec wrangler deployments list --name void1
 - `dist/`、`.void/`、`.wrangler/`、`.agents/` 都是生成或本机辅助目录，不提交。
 - `wrangler.jsonc` 不需要写 `main` 或 `assets`，Void/Cloudflare Vite 插件会在构建时生成。
 - 不要在 `wrangler.jsonc` 里重复写 `nodejs_als`。Void 构建会注入该兼容标记，重复会导致 Cloudflare API 拒绝部署。
+- 第一版不接 Cloudflare GraphQL/API，不需要把 `CLOUDFLARE_API_TOKEN` 放进项目。
+- 第一版不配置 Cron Trigger，健康检测通过 `/admin` 或 `POST /api/check` 手动触发。
