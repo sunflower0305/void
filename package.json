@@ -9,6 +9,7 @@
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vite-plus": "^0.1.24",
+    "vitest": "^4.1.8",
     "void": "^0.9.0",
     "wrangler": "^4.97.0"
   },
@@ -18,6 +19,8 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
+    "test": "vp exec vitest run",
+    "test:watch": "vp exec vitest",
     "preview": "vp preview",
     "db:migrate:remote": "vp exec wrangler d1 migrations apply void1-db --remote",
     "db:seed:remote": "vp exec wrangler d1 execute void1-db --remote --file db/seed.sql",

@@ -71,6 +71,12 @@ vp dev
 vp build
 ```
 
+运行测试：
+
+```bash
+vp run test
+```
+
 预览构建产物：
 
 ```bash

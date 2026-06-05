@@ -1,8 +1,13 @@
 import { apps, checkRuns } from "@schema";
 import { and, db, desc, eq, inArray } from "void/db";
-import { splitStack } from "./format";
+import {
+  buildDashboardData,
+  deriveCheckStatus,
+  deriveHttpErrorMessage,
+  type AppStatus,
+} from "./appops-model";
 
-export type AppStatus = "up" | "degraded" | "down" | "unknown";
+export type { AppStatus } from "./appops-model";
 
 export type AppRecord = typeof apps.$inferSelect;
 export type CheckRunRecord = typeof checkRuns.$inferSelect;
@@ -37,33 +42,7 @@ export async function getDashboardData(options: { includeInactive?: boolean } = 
           .orderBy(desc(checkRuns.checkedAt), desc(checkRuns.id))
           .limit(80);
 
-  const runsByApp = new Map<number, CheckRunRecord[]>();
-  for (const run of runs) {
-    const group = runsByApp.get(run.appId) ?? [];
-    group.push(run);
-    runsByApp.set(run.appId, group);
-  }
-
-  const summaries = rows.map((app) => {
-    const recentRuns = runsByApp.get(app.id) ?? [];
-    const latestRun = recentRuns[0] ?? null;
-    return {
-      ...app,
-      latestRun,
-      recentRuns: recentRuns.slice(0, 6),
-      status: latestRun?.status ?? "unknown",
-      stackItems: splitStack(app.stack),
-    } satisfies AppSummary;
-  });
-
-  const appById = new Map(rows.map((app) => [app.id, app]));
-  const recentRuns = runs.slice(0, 12).flatMap((run) => {
-    const app = appById.get(run.appId);
-    if (!app) return [];
-    return [{ ...run, app: { name: app.name, slug: app.slug, url: app.url } }];
-  });
-
-  return { apps: summaries, recentRuns } satisfies DashboardData;
+  return buildDashboardData(rows, runs) satisfies DashboardData;
 }
 
 export async function checkApp(app: AppRecord) {
@@ -97,8 +76,7 @@ export async function checkApp(app: AppRecord) {
       },
     });
     const responseTimeMs = Date.now() - startedAt;
-    const status: "up" | "degraded" =
-      response.status >= 200 && response.status < 400 ? "up" : "degraded";
+    const status = deriveCheckStatus(response.status);
 
     const [created] = await db
       .insert(checkRuns)
@@ -107,7 +85,7 @@ export async function checkApp(app: AppRecord) {
         status,
         httpStatus: response.status,
         responseTimeMs,
-        errorMessage: response.ok ? null : response.statusText || "Non-2xx/3xx response",
+        errorMessage: deriveHttpErrorMessage(status, response.statusText),
       })
       .returning();
 
