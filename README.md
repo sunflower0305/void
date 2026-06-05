@@ -1,6 +1,6 @@
 # void1
 
-Void + React starter，使用 Pages mode、文件路由 API 和 Cloudflare D1。当前生产环境直接部署到 Cloudflare Workers，不走 Void 平台账号。
+Void + React starter，使用 Void 的 `pages/` 页面模式、`routes/` 文件路由 API 和 Cloudflare D1。当前生产环境直接部署到 Cloudflare Workers，不走 Void 平台部署。
 
 线上地址：
 
@@ -20,46 +20,43 @@ Void + React starter，使用 Pages mode、文件路由 API 和 Cloudflare D1。
 ## 目录
 
 ```text
-pages/              Pages mode 页面和服务端 loader
+pages/              Void 页面模式和服务端 loader
 routes/             文件路由 API
 db/schema.ts        Drizzle D1 schema
 db/migrations/      D1 迁移文件
-wrangler.jsonc      Cloudflare Workers 直部署配置
+wrangler.jsonc      Cloudflare Workers 部署配置
 ```
 
 ## 本地开发
 
 这个项目用 Vite+ 启动和构建，`package.json` 里的脚本实际对应：
 
-- `pnpm dev` -> `vp dev`
-- `pnpm run build` -> `vp build`
-- `pnpm preview` -> `vp preview`
+- `vp dev`
+- `vp build`
+- `vp preview`
 
 安装依赖：
 
 ```bash
-pnpm install
+vp install
 ```
 
 启动开发服务器：
 
 ```bash
-pnpm dev
-# 或直接运行：pnpm exec vp dev
+vp dev
 ```
 
 构建：
 
 ```bash
-pnpm run build
-# 或直接运行：pnpm exec vp build
+vp build
 ```
 
 预览构建产物：
 
 ```bash
-pnpm preview
-# 或直接运行：pnpm exec vp preview
+vp preview
 ```
 
 ## 数据库
@@ -69,25 +66,25 @@ pnpm preview
 本地原型阶段可以直接推 schema：
 
 ```bash
-pnpm exec void db push
+vp exec void db push
 ```
 
 生产发布前生成迁移：
 
 ```bash
-pnpm exec void db generate
+vp exec void db generate
 ```
 
 应用远端 D1 迁移：
 
 ```bash
-pnpm run db:migrate:remote
+vp exec wrangler d1 migrations apply void1-db --remote
 ```
 
 查看远端表：
 
 ```bash
-pnpm exec wrangler d1 execute void1-db --remote --command "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name;"
+vp exec wrangler d1 execute void1-db --remote --command "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name;"
 ```
 
 ## Cloudflare 凭据
@@ -126,17 +123,17 @@ export CLOUDFLARE_API_TOKEN="你的 token"
 部署命令：
 
 ```bash
-pnpm run deploy:dry-run
-pnpm run deploy
+vp run deploy:dry-run
+vp run deploy
 ```
 
 拆开执行时，对应命令是：
 
 ```bash
-pnpm run db:migrate:remote
-pnpm run build
-pnpm exec wrangler deploy --dry-run
-pnpm exec wrangler deploy
+vp exec wrangler d1 migrations apply void1-db --remote
+vp build
+vp exec wrangler deploy --dry-run
+vp exec wrangler deploy
 ```
 
 GitHub Actions 会在 `main` 分支 push 后自动执行同一条链路。仓库需要配置 `CLOUDFLARE_API_TOKEN` 这个 GitHub Secret。
@@ -146,7 +143,7 @@ GitHub Actions 会在 `main` 分支 push 后自动执行同一条链路。仓库
 ```bash
 curl -fsS https://void.zhangleyang.com/
 curl -fsS https://void.zhangleyang.com/api/hello
-pnpm exec wrangler deployments list --name void1
+vp exec wrangler deployments list --name void1
 ```
 
 ## 注意事项
