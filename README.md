@@ -1,5 +1,7 @@
 # Cloudflare AppOps Dashboard
 
+[![zread](https://raw.githubusercontent.com/sunflower0305/claude-proxy/master/docs/assets/zread-badge.svg)](https://zread.ai/sunflower0305/void)
+
 Void + React + D1 应用健康看板，用来监控已经发布在 Cloudflare 上的真实应用：
 
 - Blog: https://blog.zhangleyang.com
