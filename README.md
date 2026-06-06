@@ -3,6 +3,9 @@
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?logo=cloudflare&logoColor=white)](https://void.zhangleyang.com)
 [![zread](https://raw.githubusercontent.com/sunflower0305/claude-proxy/master/docs/assets/zread-badge.svg)](https://zread.ai/sunflower0305/void)
 
+- 项目演示：[https://void.zhangleyang.com](https://void.zhangleyang.com)
+- 博客介绍：[https://blog.zhangleyang.com/2026-06-05-b48pzt](https://blog.zhangleyang.com/2026-06-05-b48pzt)
+
 介绍文章：https://blog.zhangleyang.com/2026-06-05-b48pzt
 
 Void + React + D1 应用健康看板，用来监控已经发布在 Cloudflare 上的真实应用：
@@ -15,11 +18,6 @@ Void + React + D1 应用健康看板，用来监控已经发布在 Cloudflare �
 - Self: https://void.zhangleyang.com
 
 这个项目使用 Void 的 `pages/` 页面模式、`routes/` 文件路由 API 和 Cloudflare D1。当前生产环境直接部署到 Cloudflare Workers，不走 Void 平台部署。
-
-线上地址：
-
-- App: https://void.zhangleyang.com
-- API: https://void.zhangleyang.com/api/status
 
 ## 技术栈
 
