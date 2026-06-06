@@ -1,6 +1,9 @@
 # Cloudflare AppOps Dashboard
 
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?logo=cloudflare&logoColor=white)](https://void.zhangleyang.com)
 [![zread](https://raw.githubusercontent.com/sunflower0305/claude-proxy/master/docs/assets/zread-badge.svg)](https://zread.ai/sunflower0305/void)
+
+介绍文章：https://blog.zhangleyang.com/2026-06-05-b48pzt
 
 Void + React + D1 应用健康看板，用来监控已经发布在 Cloudflare 上的真实应用：
 
